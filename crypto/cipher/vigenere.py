@@ -4,7 +4,7 @@ class Vigenere:
     AUTO_KEY = 3
     RUNNING_KEY = 4
     EXTENDED = 5
-    _DEFAULT_CHARSET = b'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    _DEFAULT_CHARSET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
     def __init__(self, variant, key=None, filename=None):
         if (variant < 1) and (variant > 5):
@@ -24,41 +24,42 @@ class Vigenere:
             else:
                 self._key = key
 
-    def _encrypt_standard(self, plaintext):
-        ct = b""
+    def _encrypt_standard(self, plaintext: str):
+        ct = ""
         idx_key = 0
 
         for c in plaintext:
-            if (c < ord(b'A')) or (c > ord(b'Z')):
-                ct += chr(c).encode('ascii')
+            if c not in Vigenere._DEFAULT_CHARSET:
+                ct += c
                 continue
 
-            k = self._key[idx_key] - ord(b'A')
-            c = c - ord(b'A')
-            ct += bytes([Vigenere._DEFAULT_CHARSET[(c + k) % 26]])
+            k = Vigenere._DEFAULT_CHARSET.index(self._key[idx_key])
+            c = Vigenere._DEFAULT_CHARSET.index(c)
+            ct += Vigenere._DEFAULT_CHARSET[(c + k) % 26]
             idx_key += 1
             idx_key %= len(self._key)
 
         return ct
 
-    def _encrypt_auto_key(self, plaintext):
-        ct = b""
+    def _encrypt_auto_key(self, plaintext: str):
+        ct = ""
         idx_key = 0
         extend = False
 
         for c in plaintext:
-            if (c < ord(b'A')) or (c > ord(b'Z')):
-                ct += chr(c).encode('ascii')
+            if c not in Vigenere._DEFAULT_CHARSET:
+                ct += c
                 continue
 
             if not extend:
-                k = self._key[idx_key]
+                k = Vigenere._DEFAULT_CHARSET.index(self._key[idx_key])
             else:
-                k = plaintext[idx_key]
+                while plaintext[idx_key] not in Vigenere._DEFAULT_CHARSET:
+                    idx_key += 1
+                k = Vigenere._DEFAULT_CHARSET.index(plaintext[idx_key])
 
-            k -= ord(b'A')
-            c = c - ord(b'A')
-            ct += bytes([Vigenere._DEFAULT_CHARSET[(c + k) % 26]])
+            c = Vigenere._DEFAULT_CHARSET.index(c)
+            ct += Vigenere._DEFAULT_CHARSET[(c + k) % 26]
 
             idx_key += 1
             if not extend:
@@ -68,7 +69,7 @@ class Vigenere:
 
         return ct
 
-    def _encrypt_extended(self, plaintext):
+    def _encrypt_extended(self, plaintext: bytes):
         ct = b""
         idx_key = 0
 
@@ -81,6 +82,9 @@ class Vigenere:
         return ct
 
     def encrypt(self, plaintext):
+        if type(plaintext) == str:
+            plaintext = plaintext.upper()
+
         if self._type == Vigenere.STANDARD:
             return self._encrypt_standard(plaintext)
         elif self._type == Vigenere.FULL:
@@ -92,41 +96,42 @@ class Vigenere:
         elif self._type == Vigenere.EXTENDED:
             return self._encrypt_extended(plaintext)
 
-    def _decrypt_standard(self, ciphertext):
-        pt = b""
+    def _decrypt_standard(self, ciphertext: str):
+        pt = ""
         idx_key = 0
 
         for c in ciphertext:
-            if (c < ord(b'A')) or (c > ord(b'Z')):
-                pt += chr(c).encode('ascii')
+            if c not in Vigenere._DEFAULT_CHARSET:
+                pt += c
                 continue
 
-            k = self._key[idx_key] - ord(b'A')
-            c = c - ord(b'A')
-            pt += bytes([Vigenere._DEFAULT_CHARSET[(c - k) % 26]])
+            k = Vigenere._DEFAULT_CHARSET.index(self._key[idx_key])
+            c = Vigenere._DEFAULT_CHARSET.index(c)
+            pt += Vigenere._DEFAULT_CHARSET[(c - k) % 26]
             idx_key += 1
             idx_key %= len(self._key)
 
         return pt
 
-    def _decrypt_auto_key(self, ciphertext):
-        pt = b""
+    def _decrypt_auto_key(self, ciphertext: str):
+        pt = ""
         idx_key = 0
         extend = False
 
         for c in ciphertext:
-            if (c < ord(b'A')) or (c > ord(b'Z')):
-                pt += chr(c).encode('ascii')
+            if c not in Vigenere._DEFAULT_CHARSET:
+                pt += c
                 continue
 
             if not extend:
-                k = self._key[idx_key]
+                k = Vigenere._DEFAULT_CHARSET.index(self._key[idx_key])
             else:
-                k = pt[idx_key]
+                while pt[idx_key] not in Vigenere._DEFAULT_CHARSET:
+                    idx_key += 1
+                k = Vigenere._DEFAULT_CHARSET.index(pt[idx_key])
 
-            k -= ord(b'A')
-            c = c - ord(b'A')
-            pt += bytes([Vigenere._DEFAULT_CHARSET[(c - k) % 26]])
+            c = Vigenere._DEFAULT_CHARSET.index(c)
+            pt += Vigenere._DEFAULT_CHARSET[(c - k) % 26]
 
             idx_key += 1
             if not extend:
@@ -136,7 +141,7 @@ class Vigenere:
 
         return pt
 
-    def _decrypt_extended(self, ciphertext):
+    def _decrypt_extended(self, ciphertext: bytes):
         pt = b""
         idx_key = 0
 
