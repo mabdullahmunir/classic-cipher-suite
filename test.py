@@ -30,7 +30,14 @@ def main():
     h = suite.encrypt(msg)
     print(h)
     h = suite.decrypt(h)
+    print(h, '\n')
+
+    # Test RailFence Cipher
+    suite = RailFence(3)
+    h = suite.encrypt('WEAREDISCOVEREDFLEEATONCE')
     print(h)
+    h = suite.decrypt(h)
+    print(h, '\n')
 
 
 if __name__ == '__main__':

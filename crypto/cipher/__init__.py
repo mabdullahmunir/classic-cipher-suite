@@ -1,2 +1,3 @@
-from crypto.cipher.vigenere import *
-from crypto.cipher.playfair import *
+from .vigenere import *
+from .playfair import *
+from .rail_fence import *
