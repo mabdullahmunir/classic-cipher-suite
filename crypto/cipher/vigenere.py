@@ -1,3 +1,5 @@
+import random
+
 class Vigenere:
     STANDARD = 1
     FULL = 2
@@ -5,6 +7,43 @@ class Vigenere:
     RUNNING_KEY = 4
     EXTENDED = 5
     _DEFAULT_CHARSET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    _DEFAULT_N = 26
+
+    # https://stackoverflow.com/questions/43656104/creation-of-nxn-matrix-sudoku-like
+    @staticmethod
+    def bitcount(n):
+        i = 0
+        while n:
+            i += 1
+            n &= n - 1
+        return i
+
+    def complete(self, rowset, colset, entries):
+        random.seed(self._key)
+        N = self._DEFAULT_N
+        if entries == N * N:
+            return True
+        i, j = max(
+            ((i, j) for i in range(N) for j in range(N) if self._s_box[i][j] == 0),
+            key=lambda item: (
+                self.bitcount(rowset[item[0]] | colset[item[1]])
+            )
+        )
+
+        bits = rowset[i] | colset[j]
+        p = [n for n in range(1, N + 1) if not (bits >> (n - 1)) & 1]
+        random.shuffle(p)
+
+        for n in p:
+            self._s_box[i][j] = n
+            rowset[i] |= 1 << (n - 1)
+            colset[j] |= 1 << (n - 1)
+            if self.complete(rowset, colset, entries + 1): return True
+            rowset[i] &= ~(1 << (n - 1))
+            colset[j] &= ~(1 << (n - 1))
+
+        self._s_box[i][j] = 0
+        return False
 
     def __init__(self, variant, key=None, filename=None):
         if (variant < 1) and (variant > 5):
@@ -19,10 +58,11 @@ class Vigenere:
         else:
             if key is None:
                 pass  # TODO: throw error
+
+            self._key = key
             if self._type == Vigenere.FULL:
-                pass  # TODO: generate sbox based on key
-            else:
-                self._key = key
+                self._s_box = [[0] * self._DEFAULT_N for _ in range(self._DEFAULT_N)]
+                assert self.complete([0] * self._DEFAULT_N, [0] * self._DEFAULT_N, 0)
 
     def _encrypt_standard(self, plaintext: str):
         ct = ""
