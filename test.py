@@ -11,6 +11,13 @@ def main():
     h = suite.decrypt(h)
     print(h, '\n')
 
+    # Test Vigenere Standard
+    suite = Vigenere(Vigenere.FULL, key="PIZZA")
+    h = suite.encrypt(msg)
+    print(h)
+    h = suite.decrypt(h)
+    print(h, '\n')
+
     # Test Vigenere Auto Key
     suite = Vigenere(Vigenere.AUTO_KEY, key="KILT")
     h = suite.encrypt(msg)
@@ -26,7 +33,7 @@ def main():
     print(h.decode('utf-8'), '\n')
 
     # Test Playfair Cipher
-    suite = Playfair('JALAN GANESHA SEPULUH')
+    suite = Playfair(msg)
     h = suite.encrypt(msg)
     print(h)
     h = suite.decrypt(h)
@@ -34,7 +41,7 @@ def main():
 
     # Test RailFence Cipher
     suite = RailFence(3)
-    h = suite.encrypt('WEAREDISCOVEREDFLEEATONCE')
+    h = suite.encrypt(msg)
     print(h)
     h = suite.decrypt(h)
     print(h, '\n')
